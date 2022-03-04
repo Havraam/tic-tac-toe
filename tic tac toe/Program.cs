@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 
 namespace tic_tac_toe
 {
@@ -6,127 +6,120 @@ namespace tic_tac_toe
     {
         static void Main(string[] args)
         {
-            char[] players = { 'x', 'o' };
-            int size = SetGameboardSize();
-            char[,] gameBoard = new char[size, size];
-            int[,] numericGameboard = CreateNumericGameboard(size);
-
-            startGame(players, gameBoard, numericGameboard, size);
-
-
-            
-
+            StartGame();
         }
-        public static int SetGameboardSize()
+        public static void StartGame()
         {
-            Console.WriteLine("insert gameboard size");
-            return int.Parse(Console.ReadLine());
-        } 
-        public static int[,] CreateNumericGameboard(int size)
-        {
-            int[,] numericBoard = new int[size, size];
-            for (int i = 0; i<size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    numericBoard[j, i] = i + 1 + j * size;
-                }
-            }
-            return numericBoard;
-        }
-        public static void PrintGameboard(char[,] array)
-        {
-            Console.WriteLine("-----------------");
-
-            for (int i = 0; i < array.GetLength(0); i++)
-            {
-                for (int j = 0; j < array.GetLength(1); j++)
-                {
-                    Console.Write("| {0} | ", array[i, j]);
-                }
-                Console.WriteLine();
-                Console.WriteLine("-----------------");
-
-            }
-        }
-        public static int ChooseCell(int[,] numericGameBoard,char[,] gameBoard,int size)
-        {
-            bool notInserted = true;
-            int chosenCell = 0;
-            Console.WriteLine("choose from empty cells:");
-            Console.WriteLine("-----------------");
-
-            for (int i = 0; i < numericGameBoard.GetLength(0); i++)
-            {
-                for (int j = 0; j < numericGameBoard.GetLength(1); j++)
-                {
-
-                    if (numericGameBoard[i, j] == -1)
-                        Console.Write("| {0} | ", gameBoard[i, j]);
-
-                    else
-                        Console.Write("| {0} | ", numericGameBoard[i, j]);
-                }
-                Console.WriteLine();
-                Console.WriteLine("-----------------");
-
-            }
-            while (notInserted)
-            {
-                chosenCell = int.Parse(Console.ReadLine());
-                if (chosenCell <= size*size && chosenCell > 0)
-                    notInserted = false;
-                else
-                    Console.WriteLine("choose again :");
-            }
-            return chosenCell;
-        }
-        public static int[] findIndex(int[,] array, int chosenCell)
-        {
-            bool isContinue = true;
-            int[] index = { -1,-1};
-            for (int i = 0; i < array.GetLength(0) && isContinue; i++)
-            {
-                for (int j = 0; j < array.GetLength(1) && isContinue; j++)
-                {
-                    if (array[i, j] == chosenCell)
-                    {
-                        index[0] = i;
-                        index[1] = j;
-                        isContinue = false;
-                    }
-                }
-            }
-            
-            return index;
-        }
-
-        public static void InsertToIndex(int[,] numericGameboard, char[,] gameBoard, int[] index, char player)
-        {
-            int index1 = index[0];
-            int index2 = index[1];
-            if (player == 'o')
-                gameBoard[index1, index2] = 'O';
-            else
-                gameBoard[index1, index2] = 'X';
-
-            numericGameboard[index1, index2] = -1;
-        }
-
-        public static void startGame(char[] players, char[,] gameBoard, int[,] numericGameboard,int size)
-        {
-            bool gameContinues = true;
-            while (gameContinues)
+            char[,] board = InitBoard();
+            string[,] players = GetPlayers();
+            while (GameContinues())
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    int chosenCell = ChooseCell(numericGameboard,gameBoard, size);
-                    int[] index = findIndex(numericGameboard, chosenCell);
-                    if (index[0] != -1)
-                        InsertToIndex(numericGameboard, gameBoard, index, players[i]);                    
-                    PrintGameboard(gameBoard);
+                    PlayTurn(board, players, i);
                 }
             }
+            
+            
         }
+        public static void PlayTurn (char [,] board, string[,] players,int playerIndex)
+        {
+            bool isContinue = true;
+            int dim = board.GetLength(0);
+            while (isContinue)
+            {
+                Console.WriteLine("{0} ,please choose a cell :",players[0,playerIndex]);
+                PrintBoard(board);
+                int locationNum = int.Parse(Console.ReadLine());
+                int i = GetI(locationNum, dim);
+                int j = GetJ(locationNum, dim);
+                if (IsValid(i, j, board))
+                {
+                    char[] playerIcon = players[1, playerIndex].ToCharArray();
+                    board[i, j] = playerIcon[0];
+                    isContinue = false;
+                }
+                else
+                    Console.WriteLine("invalid input insert again!");
+            }
+
+        }
+        public static bool IsValid(int i, int j, char[,] board)
+        {
+            int dim = board.GetLength(0);
+            bool isValid = false;
+            if (i < dim && j < dim && i>=0 && j>=0)
+            {
+                if (board[i, j] == 0)
+                    isValid = true;
+            }
+            return isValid;   
+        }
+         public static int GetJ (int index , int dim)
+        {
+            int j = (index - 1) % dim;
+            return j;
+        }
+        public static int GetI(int index, int dim)
+        {
+            int i = (index - 1) / dim;
+            return i;
+        }
+        public static string[,] GetPlayers()
+        {
+            string[,] players = new string[2, 2];
+            
+            Console.WriteLine("insert name of P1 :");
+            players[0, 0] = Console.ReadLine();
+            Console.WriteLine("insert name of P2 :");
+            players[0, 1] = Console.ReadLine();
+
+            players[1, 0] = "X";
+            players[1, 1] = "O";
+            Console.WriteLine("{0}(X), {1}(O) welcome to tic tac toe ",players[0,0],players[0,1]);
+
+            return players;
+        }
+        public static void PrintBoard(char[,] board)
+        {
+            int dim = board.GetLength(0);
+            Console.WriteLine("----------------------------------------------");
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    if (board[i, j] == 0)
+                    {
+                        int num = GetNum(i, j, dim);
+                        Console.Write("|{0}|\t", num);
+                    }
+                    else
+                        Console.Write("|{0}|\t", board[i, j]);
+                    
+                }
+                Console.WriteLine();
+                Console.WriteLine("----------------------------------------------");
+
+            }
+        }
+        public static char[,] InitBoard ()
+        {
+            Console.WriteLine("insert board dimension :");
+            int dim = int.Parse(Console.ReadLine());
+            char[,] gameboard = new char[dim,dim];
+            return gameboard;
+        }
+        public static int GetNum(int i , int j, int dim)
+        {
+            int num = j + 1 + i * dim;
+            return num;
+        }
+
+        public static bool GameContinues()
+        {
+            return true;
+        }
+
+        
     }
 }
