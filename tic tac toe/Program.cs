@@ -12,11 +12,24 @@ namespace tic_tac_toe
         {
             char[,] board = InitBoard();
             string[,] players = GetPlayers();
-            while (GameContinues())
+            bool gameContinues = true;
+            while (gameContinues)
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 2 && gameContinues; i++)
                 {
                     PlayTurn(board, players, i);
+                    if (ValidateCols(board) == 'X')
+                    {
+                        PrintBoard(board);
+                        Console.WriteLine("{0} is the winner ", players[0,0]);
+                        gameContinues = false;
+                    }
+                    else if (ValidateCols(board) == 'O')
+                    {
+                        PrintBoard(board);
+                        Console.WriteLine("{0} is the winner ", players[0, 1]);
+                        gameContinues = false;
+                    }
                 }
             }
             
@@ -119,7 +132,51 @@ namespace tic_tac_toe
         {
             return true;
         }
+        public static char ValidateRows (char [,] board)
+        {
+            bool isRowComplete = false;
+            char symbol = 't';
+            int dim = board.GetLength(0);
+            for (int i =0; i<dim&& !isRowComplete; i++)
+            {
+                isRowComplete = true;
 
-        
+                for (int j = 0; j<dim-1 && isRowComplete; j++)
+                {
+                    if (board[i, j] == board[i, j + 1] && (board[i,j]!=0 || board[i,j+1]!=0))
+                        isRowComplete = true;
+                    else
+                        isRowComplete = false;
+                }
+                if (isRowComplete)
+                    symbol= board[i,0];
+            }
+            return symbol;
+        }
+        public static char ValidateCols(char[,] board)
+        {
+            bool isColComplete = false;
+            char symbol = 't';
+            int dim = board.GetLength(0);
+            for (int i = 0; i < dim && !isColComplete; i++)
+            {
+                isColComplete = true;
+                for (int j = 0; j<dim-1 && isColComplete ; j++)
+                {
+                    if (board[j, i] == board[j + 1, i] && (board[j, i] != 0 || board[j+1, i] != 0))
+                        isColComplete = true;
+                    else
+                        isColComplete = false;
+                }
+                if (isColComplete)
+                    symbol = board[0, i];
+            }
+            return symbol;
+        }
+
+        public static char ValidateDiags(char[,] board)
+        {
+              
+        }
     }
 }
